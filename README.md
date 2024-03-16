@@ -1,10 +1,13 @@
 # Descartes
-
-目录
 - [重要说明](#重要说明)
 - [项目简介](#项目简介)
   - [优势](#优势)
   - [功能](#功能)
+- [快速上手](#快速上手)
+  - [系统要求](#系统要求)
+  - [索引配置](#索引配置)
+  - [接口说明](#接口说明)
+  - [使用示例](#使用示例)
 - [性能评测](#性能评测)
   - [召回与 QPS 结果对比](#召回与-qps-结果对比)
   - [QPS 结果对比](#qps-结果对比)
@@ -38,15 +41,130 @@ Descartes 是零一万物自研的向量数据库，其搜索内核通过全导�
   
 ## 功能
 
-- 支持原始图。近期会开放量化图。
+- 支持原始图和量化图。
   
-- 支持流式构建和全量构建，纯内存模式。
+- 支持流式构建，纯内存模式。
   
 - 支持单精度浮点数。近期会开放支持更多数据类型（例如，双精度浮点数、int16 和 int8 向量类型）。
   
 - 支持欧式和内积。近期会开放支持更多度量（例如，点积和汉明距离）。
+
+# 快速上手
+
+## 系统要求
+
+- Linux：Ubuntu 20.04 或更高版本
   
-- 支撑删除和更新向量。
+- gcc: 9.4.0
+  
+- cpuinfo flags：avx512f、mfma 和 mavx512bw
+  
+## 索引配置
+
+```
+# vector type: float
+vector.global.vector_type = float
+
+# dimension of vector:must less than maximum value of uint16_t
+vector.global.dimension = 128
+
+# metric type: l2, square_l2, ip
+vector.global.metric_type = square_l2
+
+# maximum document count
+vector.global.max_doc_cnt = 1000000
+
+# index directory
+vector.global.index_dir = /home/ubuntu/indexes
+
+# build result count:optional, default is 400
+vector.fng.build.build_res_cnt = 500
+
+# maximum neighbor count:optional, default is 64, can't bigger than 255
+vector.fng.build.max_neighbor_cnt = 32
+
+# search result count:optional, default is 400
+vector.fng.search.search_res_cnt = 40
+```
+
+## 接口说明
+
+```c++
+class GraphIndex {
+public:
+    GraphIndex() = default;
+    virtual ~GraphIndex() = default;
+
+public:
+    // index init from config file
+    virtual int Init(const std::string &configFilePath) = 0;
+    
+    // add vector to index
+    virtual int AddVector(const void *vector, size_t bytes, uint64_t key) = 0;
+    
+    // search vector in index with context
+    virtual int Search(const void *vector, size_t bytes, SearchContext &context) = 0;
+    
+    // refine the index. Will quantize the index if  quantize is true
+    virtual int RefineIndex(bool quantize) = 0;
+    
+    // dump index
+    virtual int Dump() = 0;
+    
+    virtual uint32_t GetCurrentDocCnt() const = 0;
+};
+
+// create index
+std::shared_ptr<GraphIndex> CreateGraphIndex();
+```
+## 使用示例
+
+```c++
+const std::string cfgFilePath = "./sift.cfg";
+const std::string dataFilePath = "sift.hdf5";
+
+H5::H5File file(dataFilePath, H5F_ACC_RDONLY);
+H5::DataSet trainDataSet = file.openDataSet("train");
+H5::DataSpace space = trainDataSet.getSpace();
+hsize_t shape[2];
+int dim = space.getSimpleExtentDims(shape);
+assert(dim = 2);
+
+std::unique_ptr<float[]> vectors(new float[shape[0] * shape[1]]);
+trainDataSet.read(vectors.get(), H5::PredType::NATIVE_FLOAT, space);
+    
+
+GraphIndexPtr indexPtr = CreateGraphIndex();
+assert(indexPtr != nullptr);
+
+int ret = indexPtr->Init(cfgFilePath);
+assert(ret == 0);
+
+#pragma omp parallel for
+for (hsize_t i = 0; i < shape[0]; ++i) {
+    int ret = indexPtr->AddVector(vectors.get() + i * shape[1], sizeof(float) * shape[1], i);
+    assert(ret == 0);
+}
+assert(indexPtr->RefineIndex(false) == 0);
+
+H5::DataSet testDataSet = file.openDataSet("test");
+space = testDataSet.getSpace();
+dim = space.getSimpleExtentDims(shape);
+assert(dim = 2);
+    
+std::unique_ptr<float[]> query(new float[shape[0] * shape[1]]);
+testDataSet.read(query.get(), H5::PredType::NATIVE_FLOAT, space);
+
+SearchContext ctx;
+ctx.topk = 10;
+ctx.searchResCnt = 20;
+for (hsize_t i = 0; i < shape[0]; ++i) {
+    int ret = indexPtr->Search(query.get() + i * shape[1], sizeof(float) * shape[1], ctx);
+    assert(ret == 0);
+}
+
+assert(indexPtr->Dump() == 0);
+```
 
 # 性能评测
 
