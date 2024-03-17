@@ -121,50 +121,42 @@ std::shared_ptr<GraphIndex> CreateGraphIndex();
 ```
 ## 使用示例
 ```c++
-const std::string cfgFilePath = "./sift.cfg";
-const std::string dataFilePath = "sift.hdf5";
+#include <vector>
+#include <string>
+#include <assert.h>
 
-H5::H5File file(dataFilePath, H5F_ACC_RDONLY);
-H5::DataSet trainDataSet = file.openDataSet("train");
-H5::DataSpace space = trainDataSet.getSpace();
-hsize_t shape[2];
-int dim = space.getSimpleExtentDims(shape);
-assert(dim = 2);
+#include "descartes_index.h"
 
-std::unique_ptr<float[]> vectors(new float[shape[0] * shape[1]]);
-trainDataSet.read(vectors.get(), H5::PredType::NATIVE_FLOAT, space);
-    
+using namespace descartes;
 
-GraphIndexPtr indexPtr = CreateGraphIndex();
-assert(indexPtr != nullptr);
+int main()
+{
+    auto index = CreateGraphIndex();
+    std::string file("./cfg");
+    assert(index->Init(file) == 0);
+    int dims = 128;
+    int cnt = 100000;
+    std::vector<float> vecs(dims * cnt);
+    for (size_t i = 0; i < vecs.size(); ++i) {
+        vecs[i] = i;
+    }
 
-int ret = indexPtr->Init(cfgFilePath);
-assert(ret == 0);
 
-#pragma omp parallel for
-for (hsize_t i = 0; i < shape[0]; ++i) {
-    int ret = indexPtr->AddVector(vectors.get() + i * shape[1], sizeof(float) * shape[1], i);
-    assert(ret == 0);
+    for (int i = 0; i <cnt; ++i) {
+        int ret = index->AddVector(vecs.data() + i * dims, sizeof(float) * dims, i);
+        assert(ret == 0);
+    }
+    assert(index->RefineIndex(false) == 0);
+
+    SearchContext ctx;
+    ctx.topk = 10;
+    ctx.searchResCnt = 20;
+    for (size_t i = 0; i < 100; ++i) {
+        int ret = index->Search(vecs.data() + i * dims, sizeof(float) * dims, ctx);
+        assert(ret == 0);         
+    }
+    assert(index->Dump() == 0);
 }
-assert(indexPtr->RefineIndex(false) == 0);
-
-H5::DataSet testDataSet = file.openDataSet("test");
-space = testDataSet.getSpace();
-dim = space.getSimpleExtentDims(shape);
-assert(dim = 2);
-    
-std::unique_ptr<float[]> query(new float[shape[0] * shape[1]]);
-testDataSet.read(query.get(), H5::PredType::NATIVE_FLOAT, space);
-
-SearchContext ctx;
-ctx.topk = 10;
-ctx.searchResCnt = 20;
-for (hsize_t i = 0; i < shape[0]; ++i) {
-    int ret = indexPtr->Search(query.get() + i * shape[1], sizeof(float) * shape[1], ctx);
-    assert(ret == 0);
-}
-
-assert(indexPtr->Dump() == 0);
 ```
 由于ANN-Bencharmks 运行环境较为苛刻，如需复现ANN-Benchmarks，请参考使用 ann-algo下面实现
 
