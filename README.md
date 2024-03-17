@@ -53,11 +53,11 @@ Descartes 是零一万物自研的向量数据库，其搜索内核通过全导�
 
 ## 系统要求
 
-- Linux：Ubuntu 20.04 或更高版本
+- Linux：Ubuntu 22.04 或更高版本
   
-- gcc: 9.4.0
+- gcc: 11.4.0
   
-- cpuinfo flags：avx512f、mfma 和 mavx512bw
+- - cpuinfo flags：avx512f、mfma 和 mavx512bw
   
 ## 索引配置
 
@@ -85,6 +85,8 @@ vector.fng.build.max_neighbor_cnt = 32
 
 # search result count:optional, default is 400
 vector.fng.search.search_res_cnt = 40
+
+vector.pqg.pq.subquantizer_cnt = 128
 ```
 
 ## 接口说明
@@ -118,7 +120,6 @@ public:
 std::shared_ptr<GraphIndex> CreateGraphIndex();
 ```
 ## 使用示例
-
 ```c++
 const std::string cfgFilePath = "./sift.cfg";
 const std::string dataFilePath = "sift.hdf5";
