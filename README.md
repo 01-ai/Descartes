@@ -235,7 +235,9 @@ RAG 向量检索主要解决的问题 |Descartes 技术特性|业界现状
 
 因此，零一万物自研了「全导航图」，其本质也是图算法的一种。全局多层缩略图导航技术，图上坐标系导航，既能保证超高精度，又能实现超高性能。
 
-<img src="./docs/assets/navigation.png" width="400" height="400">
+<p align="center">
+  <img src="./docs/assets/navigation.png" width="400" height="400">
+</p>
 
 如上图所示，「全导航图」由 2 层次导航组成：
 
