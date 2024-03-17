@@ -173,7 +173,7 @@ int main()
 
 - 当前，ANN-Benchmarks 是全球范围内最权威和常用的向量检索技术性能评测榜单之一。
   
-- 本次测试零一万物严格还原 ANN-Benchmarks 官方测试条件，包括使用了相同的硬件（AWS 的 r6i.16xlarge）及参数（并发为 31 且禁用了超线程 ），在离线状态下完成, [详见ANN-Benchmarks还原步骤](./ann-algo/ann-benchmarks.md)
+- 本次测试零一万物严格还原 ANN-Benchmarks 官方测试条件，包括使用了相同的硬件（AWS 的 r6i.16xlarge）及参数（并发为 31 且禁用了超线程 ），在离线状态下完成。如需还原 ANN-Benchmarks 测试，参阅[还原步骤](./ann-algo/ann-benchmarks.md)。
   
 - 本次测试时间为 2024 年 3 月 1 日。
   
