@@ -6,3 +6,4 @@
 6. sudo python3 install.py --algorithm  descartes
 7. sudo python3 run.py --dataset glove-25-angular --parallelism 31 --force --algorithm  'descartes(01AI)'
 8. sudo python3 create_website.py  --outputdir ./website
+9. website 中会有生成的网页和图片
