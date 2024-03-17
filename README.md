@@ -57,7 +57,7 @@ Descartes 是零一万物自研的向量数据库，其搜索内核通过全导�
   
 - gcc: 11.4.0
   
-- - cpuinfo flags：avx512f、mfma 和 mavx512bw
+- cpuinfo flags：avx512f、mfma 和 mavx512bw
   
 ## 索引配置
 
@@ -166,7 +166,7 @@ for (hsize_t i = 0; i < shape[0]; ++i) {
 
 assert(indexPtr->Dump() == 0);
 ```
-如需复现ANN-Benchmarks，可参考使用 ann-algo下面实现
+由于ANN-Bencharmks 运行环境较为苛刻，如需复现ANN-Benchmarks，请参考使用 ann-algo下面实现
 
 # 性能评测
 
