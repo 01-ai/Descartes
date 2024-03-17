@@ -166,6 +166,7 @@ for (hsize_t i = 0; i < shape[0]; ++i) {
 
 assert(indexPtr->Dump() == 0);
 ```
+如需复现ANN-Benchmarks，可参考使用 ann-algo下面实现
 
 # 性能评测
 
