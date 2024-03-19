@@ -12,6 +12,7 @@ cd Descartes/cpp
 ```
 mkdir build && cd build
 cmake ../
+```
 
 
 3. Afterwards, generated files can be used to compile the project.
