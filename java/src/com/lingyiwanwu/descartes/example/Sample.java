@@ -20,6 +20,10 @@ public class Sample {
         // init; if index has dumped before, then will load the existing data
         int res = graphIndex.init(configPath);
         System.out.println("init result is: " + res); // 0 for sucess
+        if (res != 0) {
+            System.err.println("init failed and exit");
+            System.exit(1);
+        }
 
         // same as `vector.global.dimension` in Sample.config
         int dim = 128;
@@ -37,10 +41,7 @@ public class Sample {
         context.topk = 10;
         context.searchResCnt = 50;
         context.exploreFactor = 1.0f;
-        for (int i = 0; i < 10000000; i++) {
-            context.results.clear();
-            res = graphIndex.search(vector, context); // 0 for sucess
-        }
+        res = graphIndex.search(vector, context); // 0 for sucess
         System.out.println("search result is: " + res);
         System.out.println("size of search result is: " + context.results.size());
         for (int i = 0; i < context.results.size(); i++) {
