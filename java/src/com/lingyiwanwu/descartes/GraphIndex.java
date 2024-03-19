@@ -11,17 +11,17 @@ public class GraphIndex {
     public native int init(String configFilePath);
 
     // add vector to index
-    public int addVector(float[] vector, long bytes, long key) {
+    public int addVector(float[] vector, long key) {
         byte[] byteVector = floatsToBytes(vector);
-        return addVectorInternal(byteVector, bytes, key);
+        return addVectorInternal(byteVector, vector.length * Float.BYTES, key);
     }
 
     private native int addVectorInternal(byte[] vector, long bytes, long key);
 
     // search vector in index with context
-    public int search(float[] vector, long bytes, SearchContext context) {
+    public int search(float[] vector, SearchContext context) {
         byte[] byteVector = floatsToBytes(vector);
-        byte[] resBytes = this.searchInternal(byteVector, bytes, context);
+        byte[] resBytes = this.searchInternal(byteVector, vector.length * Float.BYTES, context);
         ByteBuffer buffer = ByteBuffer.wrap(resBytes);
         // 切换为小端字节序
         buffer.order(ByteOrder.LITTLE_ENDIAN);

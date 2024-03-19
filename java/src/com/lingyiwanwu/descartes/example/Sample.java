@@ -4,12 +4,10 @@ import com.lingyiwanwu.descartes.Entity;
 import com.lingyiwanwu.descartes.GraphIndex;
 import com.lingyiwanwu.descartes.SearchContext;
 
-import java.util.Random;
-
 public class Sample {
     static {
         // 指定so文件路径
-        System.load(System.getProperty("user.dir") + "../lib/libdescartes.so");
+        System.load(System.getProperty("user.dir") + "/../lib/libdescartes.so");
 
         // 将so文件放入系统库
         // System.loadLibrary("libdescartes.so");
@@ -18,23 +16,31 @@ public class Sample {
     public static void main(String[] args) {
 
         GraphIndex graphIndex = new GraphIndex();
-        // init
-        int res = graphIndex.init(System.getProperty("user.dir") +"/src/com/lingyiwanwu/descartes/example/Sample.config");
-        System.out.println("init result is: " + res);
+        String configPath = System.getProperty("user.dir") +"/src/com/lingyiwanwu/descartes/example/Sample.config";
+        // init; if index has dumped before, then will load the existing data
+        int res = graphIndex.init(configPath);
+        System.out.println("init result is: " + res); // 0 for sucess
 
+        // same as `vector.global.dimension` in Sample.config
+        int dim = 128;
+        float[] vector = new float[dim];
         // add vector
-        long bytes = 128 * 4;
-        long key = 0;
-        float[] vector = new float[(int) bytes];
-        Random random = new Random();
         for (int i = 0; i < 5000; i++) {
-            res = graphIndex.addVector(vector, bytes, random.nextInt());
+            vector[0] = (float) i; // meaningless, just for demo
+            long key = i;
+            res = graphIndex.addVector(vector, key);
         }
-        System.out.println("addVector result is: " + res);
+        System.out.println("addVector result is: " + res); // 0 for sucess
 
         // search
-        SearchContext context = new SearchContext();
-        res = graphIndex.search(vector, bytes, context);
+        SearchContext context = new SearchContext(); // new context for each search
+        context.topk = 10;
+        context.searchResCnt = 50;
+        context.exploreFactor = 1.0f;
+        for (int i = 0; i < 10000000; i++) {
+            context.results.clear();
+            res = graphIndex.search(vector, context); // 0 for sucess
+        }
         System.out.println("search result is: " + res);
         System.out.println("size of search result is: " + context.results.size());
         for (int i = 0; i < context.results.size(); i++) {
@@ -42,8 +48,11 @@ public class Sample {
             System.out.printf("%d: (%d,%f)%n", i, entity.getKey(), entity.getScore());
         }
 
+        // optimize the index
         graphIndex.refineIndex(true);
+        // index dump path: `vector.global.index_dir` in Sample.config
         graphIndex.dump();
+        // IMPORTANT: release the resource when no longer use
         graphIndex.close();
     }
 }
