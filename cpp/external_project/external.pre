@@ -9,7 +9,7 @@ SET(PRE_DIR @DEPS_PRE_DIR@)
 
 SET(GFLAGS_ROOT_DIR @DEPS_DOWNLOAD_DIR@/gflags)
 ExternalProject_ADD (gflags
-    GIT_REPOSITORY    git@github.com:gflags/gflags.git
+    GIT_REPOSITORY    https://github.com/gflags/gflags.git
     GIT_TAG           master 
     GIT_SHALLOW       true
     SOURCE_DIR        ${GFLAGS_ROOT_DIR}
