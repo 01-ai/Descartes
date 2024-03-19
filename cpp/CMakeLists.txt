@@ -5,11 +5,11 @@ PROJECT(Descartes LANGUAGES C CXX)
 
 SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++17 -fopenmp")
 
-LINK_DIRECTORIES(${CMAKE_CURRENT_SOURCE_DIR}/lib/
+LINK_DIRECTORIES(${CMAKE_CURRENT_SOURCE_DIR}/../lib/
                  ${CMAKE_CURRENT_LIST_DIR}/external_project/install/lib)
 
 SET(DESCARTES_INCLUDE
-    ${CMAKE_CURRENT_LIST_DIR}/include
+    ${CMAKE_CURRENT_LIST_DIR}/../include
     ${CMAKE_CURRENT_LIST_DIR}/external_project/install/include
 )
 
