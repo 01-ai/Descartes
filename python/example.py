@@ -8,7 +8,7 @@ import h5py
 
 config = './cpp/config/sift.cfg'
 data = 'sift-128-euclidean.hdf5'
-search_res_cnt = 20
+search_res_cnt = 60
 
 opts, args = getopt.getopt(sys.argv[1:], "hc:d:s:", ["help", "config_file=", "dataset_file=",
                                                      "search_res_cnt="])
@@ -59,7 +59,9 @@ for i in range(test_data.shape[0]):
     context = SearchContext()
     context.topk = topk
     context.search_res_cnt = search_res_cnt
-    index.search(test_data[i, :], context)
+    ret = index.search(test_data[i, :], context)
+    if ret != 0:
+        sys.stderr.write('search failed\n')
     key_set = set()
     for entity in context.get_result():
         key, score = entity.key, entity.score
