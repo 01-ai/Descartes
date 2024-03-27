@@ -68,7 +68,7 @@ Descartes 是零一万物自研的向量数据库，其搜索内核通过全导�
   
 - gcc: 11.4.0
   
-- cpuinfo flags：avx512f、mfma 和 mavx512bw
+- cpuinfo flags：avx512f、fma 和 avx512bw
   
 ## 索引配置
 
