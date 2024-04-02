@@ -1,0 +1,55 @@
+syntax = "proto3";
+package descartes.server;
+
+// CC options
+option cc_generic_services = true;
+
+message Entity {
+    uint64 key = 1;
+    float score = 2;
+}
+
+message Status {
+    int32 code = 1;
+    string reason = 2;
+}
+
+message AddVectorRequest {
+    message Row {
+        uint64 key = 1;
+        repeated float vector = 2;
+    }
+    repeated Row rows = 1;
+}
+
+message SearchRequest {
+    repeated float vector = 1;
+    int32 topk = 2;
+    int32 search_res_cnt = 3;
+}
+
+message SearchResponse {
+    Status status = 1;
+    repeated Entity entities = 2;
+}
+
+message RefineRequest {
+    bool quantize = 1;
+}
+
+message Response {
+    Status status = 1;
+    uint32 current_doc_cnt = 2;
+}
+
+message HttpRequest { }
+
+message HttpResponse { }
+
+service Service {
+    rpc add_vector(HttpRequest) returns (HttpResponse);
+    rpc search(HttpRequest) returns (HttpResponse);
+    rpc refine_index(HttpRequest) returns (HttpResponse);
+    rpc dump(HttpRequest) returns (HttpResponse);
+    rpc current_doc_cnt(HttpRequest) returns (HttpResponse);
+}

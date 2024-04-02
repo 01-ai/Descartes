@@ -1,2 +1,10 @@
+third_party/*
+!third_party/CMakeLists.txt
+
 java/**/*.class
 java/**/*.log
+
+build/
+
+src/**/*.pb.cc
+src/**/*.pb.h
